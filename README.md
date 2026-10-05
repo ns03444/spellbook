@@ -80,18 +80,23 @@ Roadmap items (not shipped as of check): workspace libraries, library search, SS
 
 ### Recommendation
 
-**Primary: embed `@excalidraw/excalidraw` (MIT) + own app shell.** Do not fork the whole monorepo unless you need deep editor patches.
+**Phase 0: fork Excalidraw into this repo and deploy it live.** Later phases add Spellbook product layers on top (accounts, storage, collab policy, AI, teams).
 
-- Avoids tldraw production license cost.
-- Reuses proven editor; you own accounts, storage, collab policy, AI, teams.
+- MIT keeps legal friction low vs tldraw production licensing.
 - Alternative: **tldraw** if custom shapes/tools are the product (budget for commercial license).
-- Hybrid (both canvases): high cost, low upside - skip unless migrating.
+- npm `@excalidraw/excalidraw` remains an option if you only need the editor component (not a full app fork).
+
+### Getting Excalidraw into this repo
+
+- **Preferred (code inside spellbook):** Clone [excalidraw/excalidraw](https://github.com/excalidraw/excalidraw), copy the tree you need (often the whole monorepo or selected packages) into this repo. Or use `git subtree` / add a remote and pull from that URL.
+- **GitHub Fork:** Creates a separate fork under your account. You can rename or mirror into spellbook, but a fork of excalidraw is not the same as putting the code inside this repo.
+- **npm `@excalidraw/excalidraw`:** Embeds the editor without vendoring source. Not a full fork of the app.
 
 ### Architecture phases
 
 | Phase | Scope |
 | --- | --- |
-| **0 - Spike** | Vite/Next + `@excalidraw/excalidraw`; load/save `.excalidraw` JSON; auth stub |
+| **0 - Live fork** | Fork Excalidraw into the spellbook repo and deploy it live |
 | **1 - MVP** | Auth (email/OAuth), scene CRUD + cloud storage, share links (view/edit), basic live collab (WS relay), org with invites |
 | **2 - Team** | Collections, roles (owner/editor/viewer), comments, server libraries, audit log |
 | **3 - Premium parity** | Presentations, PDF/PPTX export, voice/screenshare (WebRTC or vendor), AI text→diagram + BYOK + optional MCP |
@@ -103,7 +108,7 @@ Roadmap items (not shipped as of check): workspace libraries, library search, SS
 
 | Feature | Free OSS | Plus | Spellbook |
 | --- | --- | --- | --- |
-| Editor canvas | Yes (pkg) | Yes | Embed pkg |
+| Editor canvas | Yes (pkg / app) | Yes | Fork app (Phase 0); pkg optional |
 | Live collab | App + self-host relay | Yes | Build relay + presence |
 | Cloud sync / accounts | No | Yes | **MVP** |
 | Teams / RBAC / collections | No | Yes | **MVP → Team** |
