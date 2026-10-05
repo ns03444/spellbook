@@ -1,6 +1,6 @@
 # Phase 0: Vendor Excalidraw and deploy it live
 
-Spellbook starts as a **vendored copy of [excalidraw/excalidraw](https://github.com/excalidraw/excalidraw)** (MIT) inside this repo, then run via **Docker** so a live whiteboard is reachable under your domain. Later phases add accounts, storage, collab policy, AI, and teams on top.
+Spellbook starts as a **vendored copy of [excalidraw/excalidraw](https://github.com/excalidraw/excalidraw)** (MIT) inside this repo, then run via **Docker** on **[Fly.io](https://fly.io)**. Later phases add accounts, storage, collab policy, AI, and teams on top.
 
 This doc is the working plan for Phase 0 only. See [README](./README.md) for the broader research and phase table.
 
@@ -11,14 +11,14 @@ This doc is the working plan for Phase 0 only. See [README](./README.md) for the
 - Put Excalidraw **source** into `ns03444/spellbook` (not a separate GitHub Fork repo).
 - Keep the **MIT license and copyright notices** intact.
 - Run the app with the **official Excalidraw Docker path** (build image from the vendored tree, or use `excalidraw/excalidraw` as a reference while you wire your own build).
-- Deploy somewhere public so you can open a whiteboard URL and draw.
+- Deploy on **Fly.io** so you can open a public whiteboard URL and draw.
 - Leave a clear baseline for Phase 1 (auth, cloud scenes, etc.).
 
 ## Non-goals (Phase 0)
 
 - npm embed of `@excalidraw/excalidraw` as the product path (useful later for a custom shell; **not** Phase 0).
 - Creating only a GitHub **Fork** of excalidraw under your account without putting code in this repo.
-- Obsessing over which host (any VPS or container host that can run Docker is fine).
+- Deep Fly.io tuning (regions, autoscaling, custom domains beyond getting HTTPS up).
 - Live collaboration / share rooms (needs a Socket.IO relay such as [excalidraw-room](https://github.com/excalidraw/excalidraw-room); treat as **out of scope or later**).
 - Accounts, cloud sync, billing, AI, teams, SSO.
 - Deep editor forks or rebranding beyond a light Spellbook identity if you choose.
@@ -28,10 +28,10 @@ This doc is the working plan for Phase 0 only. See [README](./README.md) for the
 ## Prerequisites
 
 - GitHub access to push `ns03444/spellbook` (main).
-- Docker installed locally (and on the host you deploy to).
+- Docker installed locally (for local smoke tests).
 - Basic familiarity with clone / rsync / `git subtree`.
-- A host that can run a container and expose HTTP(S) (VPS, Fly, Railway, ECS, k8s, etc.). Host choice is intentionally light for Phase 0.
-- Optional: domain + TLS terminator (Caddy, nginx, Traefik, or host-managed HTTPS).
+- A [Fly.io](https://fly.io) account and [`flyctl`](https://fly.io/docs/flyctl/install/) installed and logged in.
+- Optional: custom domain on Fly (Fly-managed HTTPS is fine for Phase 0).
 
 Upstream: https://github.com/excalidraw/excalidraw (MIT).
 
@@ -129,17 +129,26 @@ Notes:
 - Phase 0 success is **your** image built from the vendored tree (or an explicitly documented interim use of the official image while the build is wired). Prefer building from vendor so this repo owns the runnable artifact.
 - Standalone drawing works without a backend. Collaboration does not.
 
-### 4. Deploy live (host choice light)
+### 4. Deploy live on Fly.io
 
-- Push the same Docker image to any registry your host uses, or build on the host from this repo.
-- Run the container with a published port (or behind a reverse proxy).
-- Point a hostname at it; terminate TLS at the proxy or platform.
-- Examples of acceptable hosts: any small VPS with Docker, or a managed container platform. Do not block Phase 0 on picking the "perfect" cloud.
+Deploy the same Docker image to **Fly.io**. Keep this light: get a public HTTPS URL; defer region/autoscaling polish.
+
+Typical shape (adjust names as needed):
+
+```bash
+# From the vendored app directory that has the Dockerfile
+fly launch --name spellbook --no-deploy   # creates fly.toml; skip if you already have one
+fly deploy
+```
+
+- Internal container listens on port **80** (Excalidraw static image). Map that in `fly.toml` `[[services]]` / `internal_port`.
+- Fly terminates TLS on `*.fly.dev` (and custom domains if you add them).
+- Prefer building from the vendored tree so Spellbook owns the image Fly runs.
 
 Minimal mental model:
 
 ```text
-Browser --> HTTPS (proxy / platform) --> container :80 (Excalidraw static app)
+Browser --> HTTPS (Fly) --> container :80 (Excalidraw static app)
 ```
 
 ### 5. Optional: collab relay (out of scope / later)
@@ -157,7 +166,7 @@ Phase 0 is done when all of the following are true:
 1. Excalidraw source (or the agreed subset) lives under this repo (e.g. `vendor/excalidraw/`), not only as a separate GitHub Fork.
 2. MIT / copyright notices are retained and attributed.
 3. `docker build` + `docker run` (or equivalent compose) starts the whiteboard from that tree.
-4. A public URL loads the editor; you can draw and export/save locally as the stock app allows.
+4. A public Fly.io URL loads the editor; you can draw and export/save locally as the stock app allows.
 5. README Phase 0 one-liner matches this plan and links here.
 6. Collab relay is either absent or clearly marked optional / later (not required to call Phase 0 done).
 
@@ -170,7 +179,7 @@ Phase 0 is done when all of the following are true:
 - [ ] Root README attributes Excalidraw + MIT; Phase 0 links to this file
 - [ ] `docker build` succeeds from vendored tree
 - [ ] Local `docker run -p 5000:80 ...` loads the app
-- [ ] Image (or build-from-git) deployed on a host; public HTTPS URL works
+- [ ] `fly deploy` succeeds; public Fly HTTPS URL works
 - [ ] Smoke test: draw, undo, export PNG/SVG or `.excalidraw` as supported
 - [ ] Note in README or this file: collab relay deferred
 - [ ] Tag or commit message records upstream revision vendored

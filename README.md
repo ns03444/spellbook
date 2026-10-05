@@ -80,7 +80,7 @@ Roadmap items (not shipped as of check): workspace libraries, library search, SS
 
 ### Recommendation
 
-**Phase 0: fork Excalidraw into this repo and deploy it live.** Details: [phase0.md](./phase0.md). Later phases add Spellbook product layers on top (accounts, storage, collab policy, AI, teams).
+**Phase 0: fork Excalidraw into this repo and deploy on Fly.io (Docker).** Details: [phase0.md](./phase0.md). Later phases add Spellbook product layers on top (accounts, storage, collab policy, AI, teams).
 
 - MIT keeps legal friction low vs tldraw production licensing.
 - Alternative: **tldraw** if custom shapes/tools are the product (budget for commercial license).
@@ -96,7 +96,7 @@ Roadmap items (not shipped as of check): workspace libraries, library search, SS
 
 | Phase | Scope |
 | --- | --- |
-| **0 - Live fork** | Fork Excalidraw into the spellbook repo and deploy it live ([phase0.md](./phase0.md)) |
+| **0 - Live fork** | Fork Excalidraw into the spellbook repo; Docker on Fly.io ([phase0.md](./phase0.md)) |
 | **1 - MVP** | Auth (email/OAuth), scene CRUD + cloud storage, share links (view/edit), basic live collab (WS relay), org with invites |
 | **2 - Team** | Collections, roles (owner/editor/viewer), comments, server libraries, audit log |
 | **3 - Premium parity** | Presentations, PDF/PPTX export, voice/screenshare (WebRTC or vendor), AI text→diagram + BYOK + optional MCP |
